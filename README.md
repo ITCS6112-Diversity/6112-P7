@@ -88,7 +88,7 @@ After updating your Photo Share App with the new files from Project 7 and starti
 
 ## Problem 1: Simple Login
 
-Extend your photo app to have the notion of a user being logged in. If a user is logged in, the toolbar should include a small message "Hi <firstname>" where <firstname> is the first name of the logged-in user. The toolbar should also contain a button displaying "Logout" that will log the user out.
+Extend your photo app to have the notion of a user being logged in. If a user is logged in, the toolbar should include a small message "Hi `<firstname>`" where `<firstname>` is the first name of the logged-in user. The toolbar should also contain a button displaying "Logout" that will log the user out.
 
 If there is no user logged in, the toolbar should display "Please Login" and the main view of your application should display a new view component named `LoginRegister`. The `LoginRegister` view should provide a way for a user to login and, as part of Problem 4 below, register as a new user. All attempts to navigate to a different view (e.g., deep links) should result in the display being redirected to the `LoginRegister` view if no user is logged in. (See the hints section if you are unsure how to implement this.) In addition, the user list on the left should not be populated if the current user is not logged in. (See the section below about modifying the server endpoints to return a status of 401 (Unauthorized).)
 
@@ -100,8 +100,8 @@ Extend the Mongoose schema for `User` to add a new property `login_name`. This p
 
 Modify the web server API to support 2 new REST API calls for logging a user in and out. Like in the previous assignment we will use HTTP requests with JSON-encoded bodies to transmit model data. The API uses POST requests to:
 
-- `/admin/login` - Provides a way for the photo app's `LoginRegister` view to login in a user. The POST request JSON-encoded body should include a property `login_name` (no passwords for now) and reply with information needed by your app for logged in user. An HTTP status of 400 (Bad request) should be returned if the login failed (e.g., `login_name` is not a valid account). A parameter in the request body is accessed using `request.body.parameter_name`. Note the login register handler should ensure that there exists a user with the given `login_name`. If so, it stores some information in the Express session where it can be checked by other request handlers that need to know whether a user is logged in.
-- `/admin/logout` - A POST request with an empty body to this URL will logout the user by clearing the information stored in the session. An HTTP status of 400 (Bad request) should be returned in the user is not currently logged in.
+- `/admin/login` - Provides a way for the photo app's `LoginRegister` view to login a user. The POST request JSON-encoded body should include a property `login_name` (no passwords for now) and reply with information needed by your app for logged in user. An HTTP status of 400 (Bad request) should be returned if the login failed (e.g., `login_name` is not a valid account). A parameter in the request body is accessed using `request.body.parameter_name`. Note the login register handler should ensure that there exists a user with the given `login_name`. If so, it stores some information in the Express session where it can be checked by other request handlers that need to know whether a user is logged in.
+- `/admin/logout` - A POST request with an empty body to this URL will logout the user by clearing the information stored in the session. An HTTP status of 400 (Bad request) should be returned if the user is not currently logged in.
 
 As part of updating the web server to handle login/logout, you need to update all requests (except to `/admin/login` and `/admin/logout`) to reject the request with a status of 401 (Unauthorized) if the session state does not report a user is logged in.
 
@@ -111,7 +111,7 @@ Once you have implemented user login, the next step is to implement the ability 
 
 For the backend support extend the web server API with the following HTTP POST API:
 
-- `/commentsOfPhoto/:photo_id - Add a comment to the photo whose id is `photo_id`. The body of the POST requests should be a JSON-encoded body with a single property `comment` that contains the comment's text. The comment object created on the photo must include the identifier of the logged in user and the time when the comment was created. Your implementation should reject any empty comments with a status of 400 (Bad request).
+- `/commentsOfPhoto/:photo_id` - Add a comment to the photo whose id is `photo_id`. The body of the POST requests should be a JSON-encoded body with a single property `comment` that contains the comment's text. The comment object created on the photo must include the identifier of the logged in user and the time when the comment was created. Your implementation should reject any empty comments with a status of 400 (Bad request).
 
 ## Problem 3: Photo Uploading
 
@@ -172,7 +172,7 @@ and
 function doesPasswordMatch(hash, salt, clearTextPassword) {
 ```
 
-We provide a Mocha test file `test/passwordTest.js` that tests this interface. Please make sure that you pass the tests within this file before submitting. You will need to change the package.json scripts test line to mocha serverApiTest.js sessionInputApiTest.js passwordTest.js` so that running `npm test` runs these tests too. Changing this line also serves as indication that you've done this extra credit. You will also need to update the `loadDatabase.js` script to require `password.js` and use it to generate the correct password properties in the new user objects that the script creates.
+We provide a Mocha test file `test/passwordTest.js` that tests this interface. Please make sure that you pass the tests within this file before submitting. You will need to change the `package.json` scripts test line to `mocha serverApiTest.js sessionInputApiTest.js passwordTest.js` so that running `npm test` runs these tests too. Changing this line also serves as indication that you've done this extra credit. You will also need to update the `loadDatabase.js` script to require `password.js` and use it to generate the correct password properties in the new user objects that the script creates.
 
 ## Extra Credit #2: Handle Browser Refresh
 
@@ -305,7 +305,7 @@ processFormBody(request, response, function (err) {
 });
 ```
 
-The above code fragment uses the Node.js package `fs` so you will need to bring it into your webServer.js with:
+The above code fragment uses the Node.js package `fs` so you will need to bring it into your `webServer.js` with:
 
 ```js
 const fs = require("fs");

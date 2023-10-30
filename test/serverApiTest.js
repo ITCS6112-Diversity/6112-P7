@@ -1,25 +1,24 @@
 "use strict";
-/* jshint node: true */
 
 /**
  * Mocha test of Project 7 web API. Run using this command:
  *   node_modules/.bin/mocha serverApiTest.js
  */
 
-var assert = require("assert");
-var http = require("http");
-var async = require("async");
-var _ = require("lodash");
+const assert = require("assert");
+const http = require("http");
+const async = require("async");
+const _ = require("lodash");
 
-var models = require("../modelData/photoApp.js").models;
+const models = require("../modelData/photoApp.js").models;
 
-var port = 3000;
-var host = "localhost";
+const port = 3000;
+const host = "127.0.0.1";
 
 // Valid properties of a user list model
-var userListProperties = ["first_name", "last_name", "_id"];
+const userListProperties = ["first_name", "last_name", "_id"];
 // Valid properties of a user detail model
-var userDetailProperties = [
+const userDetailProperties = [
   "first_name",
   "last_name",
   "_id",
@@ -28,9 +27,9 @@ var userDetailProperties = [
   "occupation",
 ];
 // Valid properties of the photo model
-var photoProperties = ["file_name", "date_time", "user_id", "_id"];
+const photoProperties = ["file_name", "date_time", "user_id", "_id", "comments"];
 // Valid comments properties
-var commentProperties = ["comment", "date_time", "_id", "user"];
+const commentProperties = ["comment", "date_time", "_id", "user"];
 
 function assertEqualDates(d1, d2) {
   assert(new Date(d1).valueOf() === new Date(d2).valueOf());
@@ -45,14 +44,14 @@ function removeMongoProperties(model) {
   return model;
 }
 
-describe("Photo App API - ", function () {
-  var authCookie; // Session took from login request
+describe("Photo App: Server API Tests", function () {
+  let authCookie; // Session took from login request
 
   describe("login the user took", function () {
     it("can login took with a post to /admin/login", function (done) {
-      var postBody = JSON.stringify({ login_name: "took", password: "weak" });
+      const postBody = JSON.stringify({ login_name: "took", password: "weak" });
 
-      var options = {
+      const options = {
         hostname: host,
         port: port,
         path: "/admin/login",
@@ -63,8 +62,8 @@ describe("Photo App API - ", function () {
         },
       };
 
-      var request = http.request(options, function (response) {
-        var responseBody = "";
+      const request = http.request(options, function (response) {
+        let responseBody = "";
         response.on("data", function (chunk) {
           responseBody += chunk;
         });
@@ -99,8 +98,8 @@ describe("Photo App API - ", function () {
   });
 
   describe("test /user/list", function (done) {
-    var userList;
-    var Users = models.userListModel();
+    let userList;
+    const Users = models.userListModel();
 
     it("can get the list of user", function (done) {
       http.get(
@@ -111,7 +110,7 @@ describe("Photo App API - ", function () {
           headers: { Cookie: authCookie },
         },
         function (response) {
-          var responseBody = "";
+          let responseBody = "";
           response.on("data", function (chunk) {
             responseBody += chunk;
           });
@@ -147,7 +146,7 @@ describe("Photo App API - ", function () {
       async.each(
         Users,
         function (realUser, callback) {
-          var user = _.find(userList, {
+          const user = _.find(userList, {
             first_name: realUser.first_name,
             last_name: realUser.last_name,
           });
@@ -163,7 +162,7 @@ describe("Photo App API - ", function () {
             1,
             "Multiple users with id:" + user._id
           );
-          var extraProps = _.difference(
+          const extraProps = _.difference(
             Object.keys(removeMongoProperties(user)),
             userListProperties
           );
@@ -180,8 +179,8 @@ describe("Photo App API - ", function () {
   });
 
   describe("test /user/:id", function (done) {
-    var userList;
-    var Users = models.userListModel();
+    let userList;
+    const Users = models.userListModel();
 
     it("can get the list of user", function (done) {
       http.get(
@@ -192,7 +191,7 @@ describe("Photo App API - ", function () {
           headers: { Cookie: authCookie },
         },
         function (response) {
-          var responseBody = "";
+          let responseBody = "";
           response.on("data", function (chunk) {
             responseBody += chunk;
           });
@@ -214,7 +213,7 @@ describe("Photo App API - ", function () {
       async.each(
         Users,
         function (realUser, callback) {
-          var user = _.find(userList, {
+          const user = _.find(userList, {
             first_name: realUser.first_name,
             last_name: realUser.last_name,
           });
@@ -225,8 +224,8 @@ describe("Photo App API - ", function () {
               " " +
               realUser.last_name
           );
-          var userInfo;
-          var id = user._id;
+          let userInfo;
+          const id = user._id;
           http.get(
             {
               hostname: host,
@@ -235,7 +234,7 @@ describe("Photo App API - ", function () {
               headers: { Cookie: authCookie },
             },
             function (response) {
-              var responseBody = "";
+              let responseBody = "";
               response.on("data", function (chunk) {
                 responseBody += chunk;
               });
@@ -249,7 +248,7 @@ describe("Photo App API - ", function () {
                 assert.strictEqual(userInfo.description, realUser.description);
                 assert.strictEqual(userInfo.occupation, realUser.occupation);
 
-                var extraProps = _.difference(
+                const extraProps = _.difference(
                   Object.keys(removeMongoProperties(userInfo)),
                   userDetailProperties
                 );
@@ -276,7 +275,7 @@ describe("Photo App API - ", function () {
           headers: { Cookie: authCookie },
         },
         function (response) {
-          var responseBody = "";
+          let responseBody = "";
           response.on("data", function (chunk) {
             responseBody += chunk;
           });
@@ -291,9 +290,9 @@ describe("Photo App API - ", function () {
   });
 
   describe("test /photosOfUser/:id", function (done) {
-    var userList;
-    var Users = models.userListModel();
-    var lastUserID;
+    let userList;
+    const Users = models.userListModel();
+    let lastUserID;
 
     it("can get the list of user", function (done) {
       http.get(
@@ -304,7 +303,7 @@ describe("Photo App API - ", function () {
           headers: { Cookie: authCookie },
         },
         function (response) {
-          var responseBody = "";
+          let responseBody = "";
           response.on("data", function (chunk) {
             responseBody += chunk;
           });
@@ -327,7 +326,7 @@ describe("Photo App API - ", function () {
         Users,
         function (realUser, callback) {
           // validate the the user is in the list once
-          var user = _.find(userList, {
+          const user = _.find(userList, {
             first_name: realUser.first_name,
             last_name: realUser.last_name,
           });
@@ -338,8 +337,8 @@ describe("Photo App API - ", function () {
               " " +
               realUser.last_name
           );
-          var photos;
-          var id = user._id;
+          let photos;
+          const id = user._id;
           lastUserID = id;
           http.get(
             {
@@ -349,7 +348,7 @@ describe("Photo App API - ", function () {
               headers: { Cookie: authCookie },
             },
             function (response) {
-              var responseBody = "";
+              let responseBody = "";
               response.on("data", function (chunk) {
                 responseBody += chunk;
               });
@@ -365,7 +364,7 @@ describe("Photo App API - ", function () {
                 );
                 photos = JSON.parse(responseBody);
 
-                var real_photos = models.photoOfUserModel(realUser._id);
+                const real_photos = models.photoOfUserModel(realUser._id);
 
                 assert.strictEqual(
                   real_photos.length,
@@ -373,7 +372,7 @@ describe("Photo App API - ", function () {
                   "wrong number of photos returned"
                 );
                 _.forEach(real_photos, function (real_photo) {
-                  var matches = _.filter(photos, {
+                  const matches = _.filter(photos, {
                     file_name: real_photo.file_name,
                   });
                   assert.strictEqual(
@@ -381,14 +380,10 @@ describe("Photo App API - ", function () {
                     1,
                     " looking for photo " + real_photo.file_name
                   );
-                  var photo = matches[0];
-                  var photoProps = photoProperties;
-                  if (true) {
-                    photoProps = photoProps.concat("comments");
-                  }
-                  var extraProps1 = _.difference(
+                  const photo = matches[0];
+                  const extraProps1 = _.difference(
                     Object.keys(removeMongoProperties(photo)),
-                    photoProps
+                    photoProperties
                   );
                   assert.strictEqual(
                     extraProps1.length,
@@ -407,11 +402,11 @@ describe("Photo App API - ", function () {
                     );
 
                     _.forEach(real_photo.comments, function (real_comment) {
-                      var comment = _.find(photo.comments, {
+                      const comment = _.find(photo.comments, {
                         comment: real_comment.comment,
                       });
                       assert(comment);
-                      var extraProps2 = _.difference(
+                      const extraProps2 = _.difference(
                         Object.keys(removeMongoProperties(comment)),
                         commentProperties
                       );
@@ -425,7 +420,7 @@ describe("Photo App API - ", function () {
                         real_comment.date_time
                       );
 
-                      var extraProps3 = _.difference(
+                      const extraProps3 = _.difference(
                         Object.keys(removeMongoProperties(comment.user)),
                         userListProperties
                       );
@@ -468,7 +463,7 @@ describe("Photo App API - ", function () {
           headers: { Cookie: authCookie },
         },
         function (response) {
-          var responseBody = "";
+          let responseBody = "";
           response.on("data", function (chunk) {
             responseBody += chunk;
           });
