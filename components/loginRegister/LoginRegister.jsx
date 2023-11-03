@@ -18,27 +18,28 @@ class LoginRegister extends React.Component {
     console.log(this.props);
   }
 
-  setUsername(username){
-    console.log(username);
-    this.setState({username: username});
-  }
+  setUsername = e => {
+    this.setState({username: e.target.value});
+  };
 
-  setPassword(password){
-    this.setState({password: password});
-  }
+  setPassword = e => {
+    this.setState({password: e.target.value});
+  };
 
-  handleSubmit(e) {
-    
-  }
+  handleSubmit = e => {
+    e.preventDefault();
+    console.log("Username: " + this.state.username + "\nPassword: " + this.state.password);
+    // TODO: Send login request to server
+  };
 
   render() {
     return (
       <div className="login-register">
-        <Box component="form" className="login-box" sx={{ boxShadow: 3 }} onSubmit={this.handleSubmit}>
+        <Box component="form" className="login-box" sx={{ boxShadow: 3 }}>
           <Typography component="h1" className="login-header">Sign In</Typography>
-          <TextField label="Username" variant="standard" onChange={e => this.setUsername(e.target.value)}/>
-          <TextField label="Password" variant="standard" onChange={e => this.setPassword(e.target.value)}/>
-          <Button type="submit" variant="contained" className="login-button">Login</Button>
+          <TextField label="Username" variant="standard" value={this.state.username} onChange={this.setUsername}/>
+          <TextField label="Password" variant="standard" value={this.state.password} onChange={this.setPassword}/>
+          <Button type="submit" variant="contained" className="login-button" onClick={this.handleSubmit}>Login</Button>
         </Box>
       </div>
     );
