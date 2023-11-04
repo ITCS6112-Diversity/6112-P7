@@ -18,9 +18,15 @@ import LoginRegister from './components/loginRegister/LoginRegister';
 class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
+    this.handleLogin = this.handleLogin.bind(this);
     this.state = {
-      loggedInUid: null
+      loggedInUser: null
     };
+  }
+
+  handleLogin(user){
+    this.setState({loggedInUser: user});
+    console.log(this.state.loggedInUser);
   }
 
   render() {
@@ -29,7 +35,7 @@ class PhotoShare extends React.Component {
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar/>
+          <TopBar loggedInUser={this.state.loggedInUser}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>
@@ -42,7 +48,7 @@ class PhotoShare extends React.Component {
             <Switch>
             <Route exact path="/"/>
             <Route path="/login-register"
-              render={ props => <LoginRegister {...props} loggedInUid={this.state.loggedInUid}/> }
+              render={ props => <LoginRegister {...props} onLogin={this.handleLogin}/> }
             />
             <Route path="/users/:userId"
               render={ props => <UserDetail {...props} /> }

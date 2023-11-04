@@ -26,6 +26,7 @@ class TopBar extends React.Component {
   }
   
   componentDidUpdate(prevProps){
+    console.log(prevProps, this.props);
     if (this.props.location.pathname !== prevProps.location.pathname && this.props.location.pathname.split("/")[2] !== undefined){
       this.getUserData();
     }
@@ -66,6 +67,7 @@ class TopBar extends React.Component {
             <i>Version: {this.state.version && (this.state.version.__v)}</i> 
           </Typography>
           <Typography variant="h5">
+            {this.props.loggedInUser && ("Hi " + this.props.loggedInUser.first_name)}
             {this.state.user && (this.userContext())}
           </Typography>
         </Toolbar>

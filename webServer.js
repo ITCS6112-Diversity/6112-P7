@@ -288,6 +288,34 @@ app.get("/photosOfUser/:id", function (request, response) {
   });
 });
 
+/**
+ * URL /admin/login - Logs in the user.
+ */
+app.post("/admin/login", function (request, response) {
+  const login_name = request.body.login_name;
+  const password = request.body.password;
+
+  if (login_name === undefined || password === undefined) {
+    response.status(400).send("Missing login_name or password");
+    return;
+  }
+
+  User.findOne({ login_name: login_name }, function (err, user) {
+    if (err) {
+      console.error("Error in /admin/login", err);
+      response.status(400).send(JSON.stringify(err));
+      return;
+    }
+    if (user === null) {
+      response.status(400).send("User with login name " + login_name + " not found");
+      return;
+    }
+
+    request.session.user = user;
+    console.log(request.session);
+    response.end(JSON.stringify(user));
+  });
+});
 
 
 const server = app.listen(3000, function () {
