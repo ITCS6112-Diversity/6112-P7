@@ -18,16 +18,21 @@ import LoginRegister from './components/loginRegister/LoginRegister';
 class PhotoShare extends React.Component {
   constructor(props) {
     super(props);
-    this.handleLogin = this.handleLogin.bind(this);
+    this.setLogin = this.setLogin.bind(this);
     this.state = {
-      loggedInUser: null
+      loggedIn: false
     };
   }
 
-  handleLogin(user){
-    this.setState({loggedInUser: user});
-    console.log(this.state.loggedInUser);
-  }
+  setLogin = () => {
+    this.setState({loggedIn: true});
+    console.log("loggedIn: ", this.state.loggedIn);
+  };
+
+  setLogout = () => {
+    this.setState({loggedIn: false});
+    console.log("loggedIn: ", this.state.loggedIn);
+  };
 
   render() {
     return (
@@ -35,7 +40,7 @@ class PhotoShare extends React.Component {
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar loggedInUser={this.state.loggedInUser}/>
+          <TopBar loggedIn={this.state.loggedIn} setLogin={this.setLogin} setLogout={this.setLogout}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>
@@ -48,7 +53,7 @@ class PhotoShare extends React.Component {
             <Switch>
             <Route exact path="/"/>
             <Route path="/login-register"
-              render={ props => <LoginRegister {...props} onLogin={this.handleLogin}/> }
+              render={ props => <LoginRegister {...props} setLogin={this.setLogin}/> }
             />
             <Route path="/users/:userId"
               render={ props => <UserDetail {...props} /> }

@@ -61,6 +61,11 @@ app.use(express.static(__dirname));
 app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
 app.use(bodyParser.json());
 
+function isAuthenticated (req, res, next) {
+  if (req.session.user) next();
+  else next('route');
+}
+
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
 });
@@ -144,7 +149,7 @@ app.get("/test/:p1", function (request, response) {
 /**
  * URL /user/list - Returns all the User objects.
  */
-app.get("/user/list", function (request, response) {
+app.get("/user/list", isAuthenticated, function (request, response) {
 
   // Get all users
   User.find({}, function (err, users) {
@@ -290,8 +295,9 @@ app.get("/photosOfUser/:id", function (request, response) {
 
 /**
  * URL /admin/login - Logs in the user.
+ * Credit: https://github.com/expressjs/session#user-login
  */
-app.post("/admin/login", function (request, response) {
+app.post("/admin/login", function (request, response, next) {
   const login_name = request.body.login_name;
   const password = request.body.password;
 
@@ -311,9 +317,36 @@ app.post("/admin/login", function (request, response) {
       return;
     }
 
-    request.session.user = user;
-    console.log(request.session);
-    response.end(JSON.stringify(user));
+    request.session.regenerate(function (regenerate_err) {
+      if (regenerate_err) next(regenerate_err);
+
+      request.session.user = user;
+
+      request.session.save(function (save_err) {
+        if (save_err) next(save_err);
+        response.status(200).end(JSON.stringify(user._id));
+      });
+    });
+
+    // request.session.user = user;
+    // console.log(request.session);
+    // response.end(JSON.stringify(user));
+  });
+});
+
+/**
+ * URL /admin/logout - Logs out the user.
+ * Credit: https://github.com/expressjs/session#user-login
+ */
+app.post("/admin/logout", function (request, response, next) {
+  request.session.user = null;
+  request.session.save(function (err) {
+    if (err) next(err);
+
+    request.session.regenerate(function (regenerate_err) {
+      if (regenerate_err) next(regenerate_err);
+      response.status(200).end("Success");
+    });
   });
 });
 

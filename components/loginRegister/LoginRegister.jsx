@@ -37,8 +37,13 @@ class LoginRegister extends React.Component {
       password: this.state.password
     }).then((response) => {
       console.log(response);
+      const uid = response.data;
+
       this.setState({error_message: ""});
-      this.props.onLogin(response.data);
+      localStorage.setItem("uid", uid); // Keep logged in user's uid in localStorage to persist login on refresh, etc
+
+      this.props.setLogin();
+      this.props.history.push("/users/" + uid);
     }).catch(() => {
       this.setState({error_message: "Incorrect username or password"});
     });

@@ -11,3 +11,16 @@
   font-size: 1.1rem;
   color: #ced8ff;
 }
+
+.topbar-user-container {
+  display: flex;
+  align-items: center;
+}
+
+.topbar-logged-in-user {
+  margin-right: 1rem!important;
+}
+
+.topbar-logout-button {
+  background-color: #288df3!important;
+}
