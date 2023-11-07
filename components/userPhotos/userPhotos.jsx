@@ -5,7 +5,14 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Divider
+  Divider,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton
 } from '@mui/material';
 import './userPhotos.css';
 import { Link } from 'react-router-dom';
@@ -19,7 +26,8 @@ class UserPhotos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      photos: null
+      photos: null,
+      isDialogOpen: false
     };
   }
 
@@ -32,6 +40,14 @@ class UserPhotos extends React.Component {
       this.setState({ photos: response.data });
     });
   }
+
+  handleDialogOpen = () => {
+    this.setState({isDialogOpen: true});
+  };
+
+  handleDialogClose = () => {
+    this.setState({isDialogOpen: false});
+  };
 
   render() {
     return (
@@ -68,11 +84,29 @@ class UserPhotos extends React.Component {
                         </div>
                       )) : null
                     }
+                    <IconButton className="comment-plus-button" variant="outlined" onClick={this.handleDialogOpen}> + </IconButton>
                   </CardContent>
                 </Card>
               </Grid>
             ))
           )}
+          <Dialog className="comment-dialog" open={this.state.isDialogOpen} onClose={this.handleDialogClose}>
+            <DialogTitle>Add a comment</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                id="comment-text"
+                label="Comment"
+                type="text"
+                fullWidth
+                variant="standard"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleDialogClose}>Cancel</Button>
+              <Button onClick={this.handleDialogClose}>Add</Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </div>
     );

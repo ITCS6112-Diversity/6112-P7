@@ -353,6 +353,43 @@ app.post("/admin/logout", function (request, response, next) {
   });
 });
 
+/**
+ * URL /commentsOfPhoto/:photo_id - Adds a comment to the photo whose id is photo_id
+ */
+app.post("/commentsOfPhoto/:photo_id", isAuthenticated, function (request, response) {
+  const comment_text = request.body.comment;
+  const comment_photo_id = request.params.photo_id;
+  const comment_user_id = request.session.user._id;
+  const comment_date_time = Date.now();
+
+  if (comment_text === undefined) {
+    response.status(400).send("Missing comment");
+    return;
+  }
+
+  Photo.updateOne({_id: comment_photo_id}, {$push: 
+    {
+      comments: {
+        comment: comment_text, 
+        user_id: comment_user_id, 
+        date_time: comment_date_time
+      }
+    }
+  }, function (err, photo) {
+    if (err) {
+      console.error("Error in /commentsOfPhoto/:photo_id", err);
+      response.status(400).send(JSON.stringify(err));
+      return;
+    }
+    if (photo === null) {
+      response.status(400).send("Photo not found");
+      return;
+    }
+
+    response.status(200).end("Success");
+  });
+
+});
 
 const server = app.listen(3000, function () {
   const port = server.address().port;
