@@ -22,10 +22,20 @@ class UserList extends React.Component {
   }
 
   componentDidMount() {
-    this.getUsersData();
+    if (this.props.loggedIn){
+      this.getUsersData();
+    }
+  }
+
+  componentDidUpdate(prevProps){
+    // If login status changes to logged in, get the logged in user's data
+    if (this.props.loggedIn !== prevProps.loggedIn && this.props.loggedIn){
+      this.getUsersData();
+    }
   }
 
   getUsersData() {
+    console.log("getUsersData", this.props.loggedIn);
     axios.get("http://localhost:3000/user/list").then((response) => {
       this.setState({ users: response.data });
     });

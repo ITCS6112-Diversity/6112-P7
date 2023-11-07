@@ -16,10 +16,6 @@ class LoginRegister extends React.Component {
     };
   }
 
-  componentDidMount() {
-    console.log(this.props);
-  }
-
   setLoginName = e => {
     this.setState({login_name: e.target.value});
   };
@@ -30,7 +26,6 @@ class LoginRegister extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log("login_name: " + this.state.login_name + "\nPassword: " + this.state.password);
     
     axios.post("http://localhost:3000/admin/login", {
       login_name: this.state.login_name,

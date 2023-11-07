@@ -58,12 +58,15 @@ mongoose.connect("mongodb://127.0.0.1/project6", {
 // We have the express static module
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
-app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(session({secret: "secretKey", resave: true, saveUninitialized: true, maxAge: 30000}));
 app.use(bodyParser.json());
 
 function isAuthenticated (req, res, next) {
   if (req.session.user) next();
-  else next('route');
+  else {
+    res.status(401).send("Unauthorized");
+    // next('route');
+  }
 }
 
 app.get("/", function (request, response) {
@@ -180,7 +183,7 @@ app.get("/user/list", isAuthenticated, function (request, response) {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-app.get("/user/:id", function (request, response) {
+app.get("/user/:id", isAuthenticated, function (request, response) {
   const id = request.params.id;
 
   // Get user by id
@@ -213,7 +216,7 @@ app.get("/user/:id", function (request, response) {
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get("/photosOfUser/:id", function (request, response) {
+app.get("/photosOfUser/:id", isAuthenticated, function (request, response) {
   const id = request.params.id;
 
   // Check if id is valid before attempting to convert id to ObjectId for query

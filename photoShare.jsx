@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
-  HashRouter, Route, Switch
+  HashRouter, Route, Switch, Redirect
 } from 'react-router-dom';
 import {
   Grid, Paper
@@ -20,7 +20,7 @@ class PhotoShare extends React.Component {
     super(props);
     this.setLogin = this.setLogin.bind(this);
     this.state = {
-      loggedIn: false
+      loggedIn: localStorage.getItem("uid") !== null
     };
   }
 
@@ -45,23 +45,28 @@ class PhotoShare extends React.Component {
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>
           <Paper className="main-grid-item">
-            <UserList />
+            {this.state.loggedIn && <UserList loggedIn={this.state.loggedIn}/>}
           </Paper>
         </Grid>
         <Grid item sm={9}>
           <Paper className="main-grid-item">
             <Switch>
-            <Route exact path="/"/>
-            <Route path="/login-register"
-              render={ props => <LoginRegister {...props} setLogin={this.setLogin}/> }
-            />
-            <Route path="/users/:userId"
-              render={ props => <UserDetail {...props} /> }
-            /> 
-            <Route path="/photos/:userId"
-              render ={ props => <UserPhotos {...props} /> }
-            />
-            <Route path="/users" component={UserList}  />
+              <Redirect exact path="/" to="/login-register" replace/>
+              <Route path="/login-register"
+                render={ props => <LoginRegister {...props} setLogin={this.setLogin}/> }
+              />
+              {
+                this.state.loggedIn ?
+                  <Route path="/users/:userId" render={ props => <UserDetail {...props} /> }/> 
+                  :
+                  <Redirect path="/users/:userId" to="/login-register"/>
+              }
+              {
+                this.state.loggedIn ?
+                  <Route path="/photos/:userId" render={ props => <UserPhotos {...props} /> }/>
+                  :
+                  <Redirect path="/photos/:userId" to="/login-register"/>
+              }
             </Switch>
           </Paper>
         </Grid>

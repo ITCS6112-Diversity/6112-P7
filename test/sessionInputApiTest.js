@@ -40,8 +40,10 @@ describe("Photo App: Session and Input API Tests", function () {
   describe("test /admin/login and /admin/logout", function (done) {
     it("errors getting the list of user if not logged in", function (done) {
       axios.get(makeFullUrl("/user/list")).then(function (response) {
+        debugger;
         assert.fail("Expected error not received");
       }).catch(function (error) {
+        debugger;
         assert.strictEqual(
           error.response.status,
           401,

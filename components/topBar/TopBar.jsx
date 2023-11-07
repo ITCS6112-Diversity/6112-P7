@@ -20,21 +20,15 @@ class TopBar extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.location.pathname.split("/")[2] !== undefined){
+    if (this.props.location.pathname.split("/")[2] !== undefined && this.props.loggedIn){
       this.getUserData();
     }
     this.getVersionData();
-
-    // Maintain login status on refresh
-    if (localStorage.getItem("uid") !== null) {
-      this.props.setLogin();
-      this.getLoggedInUser();
-    }
+    this.getLoggedInUser();
   }
   
   componentDidUpdate(prevProps){
-    console.log(prevProps, this.props);
-    if (this.props.location.pathname !== prevProps.location.pathname && this.props.location.pathname.split("/")[2] !== undefined){
+    if (this.props.location.pathname !== prevProps.location.pathname && this.props.location.pathname.split("/")[2] !== undefined && this.props.loggedIn){
       this.getUserData();
     }
 
@@ -83,13 +77,12 @@ class TopBar extends React.Component {
     e.preventDefault();
 
     axios.post("http://localhost:3000/admin/logout")
-    .then((response) => {
-      console.log(response);
-
+    .then(() => {
       localStorage.removeItem("uid");
-      console.log("props", this.props);
       this.props.setLogout();
-      this.props.history.push("/login-register");
+      if (this.props.location.pathname.split("/")[1] !== "login-register"){
+        this.props.history.push("/login-register");
+      }
     }).catch(() => {
       console.log("Error logging out");
     });
