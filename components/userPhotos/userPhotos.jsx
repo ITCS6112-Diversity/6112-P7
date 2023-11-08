@@ -36,6 +36,13 @@ class UserPhotos extends React.Component {
     this.getPhotoData();
   }
 
+  componentDidUpdate(prevProps){
+    if (this.props.newPhotoAdded !== prevProps.newPhotoAdded && this.props.newPhotoAdded){
+      this.getPhotoData();
+      this.props.setNewPhotoAdded(false);
+    }
+  }
+
   getPhotoData() {
     axios.get("http://localhost:3000/photosOfUser/" + this.props.match.params.userId).then((response) => {
       this.setState({ photos: response.data });

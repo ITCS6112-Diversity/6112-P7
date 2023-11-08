@@ -22,6 +22,7 @@ class PhotoShare extends React.Component {
     this.setLogin = this.setLogin.bind(this);
     this.state = {
       loggedIn: false,
+      newPhotoAdded: false
     };
   }
 
@@ -33,6 +34,11 @@ class PhotoShare extends React.Component {
   setLogout = () => {
     this.setState({loggedIn: false});
     console.log("loggedIn: ", this.state.loggedIn);
+  };
+
+  setNewPhotoAdded = (isAdded) => {
+    console.log("setnewphotoadded", isAdded);
+    this.setState({newPhotoAdded: isAdded});
   };
 
   componentDidMount() {
@@ -51,7 +57,7 @@ class PhotoShare extends React.Component {
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar loggedIn={this.state.loggedIn} setLogin={this.setLogin} setLogout={this.setLogout}/>
+          <TopBar loggedIn={this.state.loggedIn} setLogin={this.setLogin} setLogout={this.setLogout} setNewPhotoAdded={this.setNewPhotoAdded} newPhotoAdded={this.state.newPhotoAdded}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>
@@ -74,7 +80,7 @@ class PhotoShare extends React.Component {
               }
               {
                 this.state.loggedIn ?
-                  <Route path="/photos/:userId" render={ props => <UserPhotos {...props} /> }/>
+                  <Route path="/photos/:userId" render={ props => <UserPhotos {...props} setNewPhotoAdded={this.setNewPhotoAdded} newPhotoAdded={this.state.newPhotoAdded}/> } />
                   :
                   <Redirect path="/photos/:userId" to="/login-register"/>
               }

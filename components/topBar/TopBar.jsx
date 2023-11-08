@@ -1,6 +1,13 @@
 import React from 'react';
 import {
-  AppBar, Button, Toolbar, Typography
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
 } from '@mui/material';
 import './TopBar.css';
 import { withRouter } from "react-router";
@@ -15,7 +22,8 @@ class TopBar extends React.Component {
     this.state = {
       user: null,
       version: null,
-      loggedInUser: null
+      loggedInUser: null,
+      isDialogOpen: false
     };
   }
 
@@ -89,12 +97,35 @@ class TopBar extends React.Component {
 
   };
 
+  handleDialogOpen = () => {
+    this.setState({isDialogOpen: true});
+  };
+
+  handleDialogClose = () => {
+    this.setState({isDialogOpen: false});
+  };
+
+  handlePhotoUpload = (e) => {
+    e.preventDefault();
+    if (this.uploadInput.files.length > 0) {
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      const domForm = new FormData();
+      domForm.append('uploadedphoto', this.uploadInput.files[0]);
+      axios.post('/photos/new', domForm)
+        .then(() => {
+          this.props.setNewPhotoAdded(true);
+          this.handleDialogClose();
+        })
+        .catch(err => console.log(`POST ERR: ${err}`));
+    }
+  };
+
   render() {
     return (
       <AppBar className="topbar-appBar" position="absolute">
         <Toolbar className="topbar-toolbar">
           <Typography variant="h5" color="inherit">
-            ITCS-6112 Team Diversity&apos;s Photo Sharing App &nbsp;
+            ITCS-6112 Team Diversity&apos;s Photo Sharing App &nbsp; <br/>
             <i>Version: {this.state.version && (this.state.version.__v)}</i> 
           </Typography>
           <Typography className="topbar-user-context" variant="h5">
@@ -109,6 +140,9 @@ class TopBar extends React.Component {
                   <Typography className="topbar-logged-in-user" variant="h5">
                     Hi, {this.state.loggedInUser.first_name}
                   </Typography>
+                  <Button variant="contained" className="topbar-add-photo-button" onClick={this.handleDialogOpen}>
+                      Add Photo
+                  </Button>
                   <Button variant="contained" className="topbar-logout-button" onClick={this.handleLogout}>
                       Logout
                   </Button>
@@ -125,6 +159,16 @@ class TopBar extends React.Component {
           }
 
         </Toolbar>
+        <Dialog className="photo-dialog" open={this.state.isDialogOpen} onClose={this.handleDialogClose}>
+          <DialogTitle>Add a photo</DialogTitle>
+          <DialogContent>
+            <input type="file" accept="image/*" ref={(domFileRef) => { this.uploadInput = domFileRef; }} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleDialogClose}>Cancel</Button>
+            <Button onClick={this.handlePhotoUpload}>Add</Button>
+          </DialogActions>
+        </Dialog>
       </AppBar>
     );
   }
