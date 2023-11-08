@@ -27,7 +27,8 @@ class UserPhotos extends React.Component {
     super(props);
     this.state = {
       photos: null,
-      isDialogOpen: false
+      isDialogOpen: false,
+      selectedPhotoId: null
     };
   }
 
@@ -41,12 +42,27 @@ class UserPhotos extends React.Component {
     });
   }
 
-  handleDialogOpen = () => {
+  handleDialogOpen = (selectedPhotoId) => {
     this.setState({isDialogOpen: true});
+    this.setState({selectedPhotoId: selectedPhotoId});
   };
 
   handleDialogClose = () => {
     this.setState({isDialogOpen: false});
+    this.setState({selectedPhotoId: null});
+  };
+
+  handleCommentSubmit = () => {
+    console.log("photo id: ", this.state.selectedPhotoId);
+
+    if (this.state.selectedPhotoId !== null){
+      axios.post("http://localhost:3000/commentsOfPhoto/" + this.state.selectedPhotoId, {
+        comment: document.getElementById("comment-text").value
+      }).then(() => {
+        this.getPhotoData();
+        this.handleDialogClose();
+      });
+    }
   };
 
   render() {
@@ -84,7 +100,7 @@ class UserPhotos extends React.Component {
                         </div>
                       )) : null
                     }
-                    <IconButton className="comment-plus-button" variant="outlined" onClick={this.handleDialogOpen}> + </IconButton>
+                    <IconButton className="comment-plus-button" variant="outlined" onClick={() => this.handleDialogOpen(photo._id)}> + </IconButton>
                   </CardContent>
                 </Card>
               </Grid>
@@ -104,7 +120,7 @@ class UserPhotos extends React.Component {
             </DialogContent>
             <DialogActions>
               <Button onClick={this.handleDialogClose}>Cancel</Button>
-              <Button onClick={this.handleDialogClose}>Add</Button>
+              <Button onClick={this.handleCommentSubmit}>Add</Button>
             </DialogActions>
           </Dialog>
         </Grid>

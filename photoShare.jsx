@@ -6,6 +6,7 @@ import {
 import {
   Grid, Paper
 } from '@mui/material';
+import axios from 'axios';
 import './styles/main.css';
 
 // import necessary components
@@ -20,7 +21,7 @@ class PhotoShare extends React.Component {
     super(props);
     this.setLogin = this.setLogin.bind(this);
     this.state = {
-      loggedIn: localStorage.getItem("uid") !== null
+      loggedIn: false,
     };
   }
 
@@ -33,6 +34,16 @@ class PhotoShare extends React.Component {
     this.setState({loggedIn: false});
     console.log("loggedIn: ", this.state.loggedIn);
   };
+
+  componentDidMount() {
+    axios.get("http://localhost:3000/admin/loggedin").then((response) => {
+      console.log("loggedIn: ", response.data);
+      if (response.data === "false"){
+        localStorage.removeItem("uid");
+      }
+      this.setState({ loggedIn: response.data });
+    });
+  }
 
   render() {
     return (
@@ -56,7 +67,7 @@ class PhotoShare extends React.Component {
                 render={ props => <LoginRegister {...props} setLogin={this.setLogin}/> }
               />
               {
-                this.state.loggedIn ?
+                this.state.loggedIn ? // Change to handle redirect by itself
                   <Route path="/users/:userId" render={ props => <UserDetail {...props} /> }/> 
                   :
                   <Redirect path="/users/:userId" to="/login-register"/>

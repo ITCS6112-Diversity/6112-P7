@@ -327,7 +327,7 @@ app.post("/admin/login", function (request, response, next) {
 
       request.session.save(function (save_err) {
         if (save_err) next(save_err);
-        response.status(200).end(JSON.stringify(user._id));
+        response.status(200).end(JSON.stringify({_id: user._id}));
       });
     });
 
@@ -354,6 +354,18 @@ app.post("/admin/logout", function (request, response, next) {
 });
 
 /**
+ * URL /admin/loggedin - Returns login status of the user.
+ */
+app.get("/admin/loggedin", function (request, response) {
+  if (request.session.user) {
+    response.status(200).end("true");
+  } else {
+    response.status(200).end("false");
+  }
+});
+
+
+/**
  * URL /commentsOfPhoto/:photo_id - Adds a comment to the photo whose id is photo_id
  */
 app.post("/commentsOfPhoto/:photo_id", isAuthenticated, function (request, response) {
@@ -363,7 +375,7 @@ app.post("/commentsOfPhoto/:photo_id", isAuthenticated, function (request, respo
   const comment_date_time = Date.now();
 
   if (comment_text === undefined) {
-    response.status(400).send("Missing comment");
+    response.status(400).send("Empty comment");
     return;
   }
 

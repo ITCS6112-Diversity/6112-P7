@@ -32,7 +32,7 @@ class LoginRegister extends React.Component {
       password: this.state.password
     }).then((response) => {
       console.log(response);
-      const uid = response.data;
+      const uid = response.data._id;
 
       this.setState({error_message: ""});
       localStorage.setItem("uid", uid); // Keep logged in user's uid in localStorage to persist login on refresh, etc
