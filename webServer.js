@@ -38,8 +38,10 @@ const async = require("async");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const multer = require("multer");
+const processFormBody = multer({storage: multer.memoryStorage()}).single('uploadedphoto');
 const express = require("express");
 const app = express();
+const fs = require("fs");
 
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
@@ -330,10 +332,6 @@ app.post("/admin/login", function (request, response, next) {
         response.status(200).end(JSON.stringify({_id: user._id}));
       });
     });
-
-    // request.session.user = user;
-    // console.log(request.session);
-    // response.end(JSON.stringify(user));
   });
 });
 
@@ -401,6 +399,68 @@ app.post("/commentsOfPhoto/:photo_id", isAuthenticated, function (request, respo
     response.status(200).end("Success");
   });
 
+});
+
+/**
+ * URL /photos/new - Adds a new photo
+ */
+app.post("/photos/new", isAuthenticated, function (request, response) {
+  processFormBody(request, response, function (err) {
+    if (err || !request.file) {
+        console.error("Error in /photos/new", err);
+        response.status(400).send(JSON.stringify(err));
+        return;
+    }
+  
+    // request.file has the following properties of interest:
+    //   fieldname    - Should be 'uploadedphoto' since that is what we sent
+    //   originalname - The name of the file the user uploaded
+    //   mimetype     - The mimetype of the image (e.g., 'image/jpeg',
+    //                  'image/png')
+    //   buffer       - A node Buffer containing the contents of the file
+    //   size         - The size of the file in bytes
+  
+    // XXX - Do some validation here.
+    if (request.file.fieldname !== "uploadedphoto") {
+      response.status(400).send("Missing uploaded photo");
+      return;
+    }
+  
+    // We need to create the file in the directory "images" under an unique name.
+    // We make the original file name unique by adding a unique prefix with a
+    // timestamp.
+    const timestamp = new Date().valueOf();
+    const filename = 'U' +  String(timestamp) + request.file.originalname;
+  
+    fs.writeFile("./images/" + filename, request.file.buffer, function (err_image) {
+      // XXX - Once you have the file written into your images directory under the
+      // name filename you can create the Photo object in the database
+      if (err_image){
+        console.error("Error in /photos/new", err_image);
+        response.status(400).send(JSON.stringify(err_image));
+        return;
+      }
+      
+      Photo.create({
+        file_name: filename,
+        date_time: Date.now(),
+        user_id: request.session.user._id,
+        comments: []
+      }, function (err_photo, photo) {
+        if (err_photo) {
+          console.error("Error in /photos/new", err_photo);
+          response.status(400).send(JSON.stringify(err_photo));
+          return;
+        }
+        if (photo === null) {
+          response.status(400).send("Photo not found");
+          return;
+        }
+    
+        response.status(200).end("Success");
+      });
+    });
+  });
 });
 
 const server = app.listen(3000, function () {
