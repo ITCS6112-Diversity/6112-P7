@@ -463,6 +463,63 @@ app.post("/photos/new", isAuthenticated, function (request, response) {
   });
 });
 
+app.post("/user", function (request, response, next) {
+  const login_name = request.body.login_name;
+  const first_name = request.body.first_name;
+  const last_name = request.body.last_name;
+  const location = request.body.location;
+  const description = request.body.description;
+  const occupation = request.body.occupation;
+  const password = request.body.password;
+
+  if (first_name === undefined || last_name === undefined || login_name === undefined || password === undefined) {
+    response.status(400).send("Missing required field");
+    return;
+  }
+
+  User.findOne({ login_name: login_name }, function (err, user) {
+    if (err) {
+      console.error("Error in /user", err);
+      response.status(400).send("Server error");
+      return;
+    }
+    if (user !== null) {
+      response.status(400).send("User with login name " + login_name + " already exists");
+    }
+  });
+
+  User.create({
+    login_name: login_name,
+    first_name: first_name,
+    last_name: last_name,
+    location: location,
+    description: description,
+    occupation: occupation,
+    password: password,
+  }, function (err, user) {
+    if (err) {
+      console.error("Error in /user", err);
+      response.status(400).send("Server error");
+      return;
+    }
+    if (user === null) {
+      response.status(400).send("Created user not found");
+      return;
+    }
+
+    request.session.regenerate(function (regenerate_err) {
+      if (regenerate_err) next(regenerate_err);
+
+      request.session.user = user;
+
+      request.session.save(function (save_err) {
+        if (save_err) next(save_err);
+        response.status(200).end(JSON.stringify({_id: user._id}));
+      });
+    });
+  });
+});
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
