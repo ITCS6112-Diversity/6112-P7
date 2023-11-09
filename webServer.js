@@ -304,9 +304,9 @@ app.get("/photosOfUser/:id", isAuthenticated, function (request, response) {
  */
 app.post("/admin/login", function (request, response, next) {
   const login_name = request.body.login_name;
-  const password = request.body.password;
+  const login_password = request.body.login_password;
 
-  if (login_name === undefined || password === undefined) {
+  if (login_name === undefined || login_password === undefined) {
     response.status(400).send("Missing login_name or password");
     return;
   }
