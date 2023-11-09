@@ -79,7 +79,7 @@ class LoginRegister extends React.Component {
     
     axios.post("http://localhost:3000/admin/login", {
       login_name: this.state.login_name,
-      login_password: this.state.login_password
+      password: this.state.login_password
     }).then((response) => {
       console.log(response);
       const uid = response.data._id;
@@ -149,8 +149,10 @@ class LoginRegister extends React.Component {
       this.props.setLogin();
       this.props.history.push("/users/" + uid);
     }).catch((error) => {
-      console.log(error);
-      this.setState({register_error_message: "Error registering user"});
+      if (error.response) {
+        this.setState({register_error_message: error.response.data});
+      }
+      
     });
 
   };

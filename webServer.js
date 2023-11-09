@@ -304,7 +304,7 @@ app.get("/photosOfUser/:id", isAuthenticated, function (request, response) {
  */
 app.post("/admin/login", function (request, response, next) {
   const login_name = request.body.login_name;
-  const login_password = request.body.login_password;
+  const login_password = request.body.password;
 
   if (login_name === undefined || login_password === undefined) {
     response.status(400).send("Missing login_name or password");
@@ -319,6 +319,11 @@ app.post("/admin/login", function (request, response, next) {
     }
     if (user === null) {
       response.status(400).send("User with login name " + login_name + " not found");
+      return;
+    }
+
+    if (user.password !== login_password) {
+      response.status(400).send("Incorrect password");
       return;
     }
 
@@ -514,7 +519,7 @@ app.post("/user", function (request, response, next) {
 
       request.session.save(function (save_err) {
         if (save_err) next(save_err);
-        response.status(200).end(JSON.stringify({_id: user._id}));
+        response.status(200).end(JSON.stringify({_id: user._id, login_name: user.login_name, email: undefined}));
       });
     });
   });
