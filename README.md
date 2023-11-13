@@ -320,3 +320,14 @@ This problem combines the techniques you needed for the previous problems.
 Use the standard class [submission mechanism](https://github.com/btdobbs/WA/tree/main/Project/00) mechanism to submit `project7`. Please clean up your project directory before submitting, as described in the submission instructions. In addition delete any images you uploaded into your images directory. If you kept the same naming convention for uploaded images that we had in the hints section, you can delete them running the command `rm -f images/U*` from your `project7` directory.
 
 [^1]: [Stanford Computer Science](https://cs.stanford.edu)
+
+# Scrum Team
+## Product Owner:
+Anas Ibrahim
+## Scrum Master:
+Patrick Flynn
+## Developers
+- Ryan Bass
+- Ashutosh Zawar
+- Saakshi Patel
+- Shubh Almal
